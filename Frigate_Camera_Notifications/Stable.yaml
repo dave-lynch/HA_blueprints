@@ -924,6 +924,11 @@ triggers:
     payload: "new"
     value_template: "{{value_json['type']}}"
     id: frigate-event
+  - trigger: mqtt
+    topic: "{{ mqtt_topic }}"
+    value_template: "{{ value_json['type'] }}"
+    payload: "genai"
+    id: genai-event
   - trigger: event
     event_type: mobile_app_notification_action
     event_data:
@@ -1010,11 +1015,12 @@ conditions:
       id: custom
     - condition: and
       conditions:
-        - condition: trigger
-          id: frigate-event
+        - condition: template
+          value_template: "{{ trigger.id in ['frigate-event','genai-event'] }}"
         - alias: Camera Match
           condition: template
-          value_template: "{{ input_camera_name|select('equalto', camera)|list|length>0 }}"
+          value_template: "{% set cam = camera if camera else (trigger.payload_json['after']['camera'] | default('')) %}
+          {{ input_camera_name|select('equalto', camera)|list|length>0 }}"
         - alias: Master Condition
           condition: !input master_condition
         - alias: Cooldown
@@ -1048,7 +1054,7 @@ actions:
       - alias: "GenAI Summary"
         conditions:
           - condition: trigger
-            id: "frigate-event"
+            id: "genai-event"
           - condition: template
             value_template: "{{ trigger.payload_json['type'] == 'genai' }}"
         sequence:
