@@ -1050,11 +1050,13 @@ conditions:
       id: custom
     - condition: and
       conditions:
-        - condition: trigger
-          id: frigate-event
+        - condition: template
+          value_template: "{{ trigger.id in ['frigate-event','genai-event'] }}"
         - alias: Camera Match
           condition: template
-          value_template: "{{ input_camera_name|select('equalto', camera)|list|length>0 }}"
+          value_template: >-
+            {% set cam = camera if camera else (trigger.payload_json['after']['camera'] | default('')) %}
+            {{ input_camera_name | select('equalto', cam) | list | length > 0 }}
         - alias: Master Condition
           condition: !input master_condition
         - alias: Cooldown
