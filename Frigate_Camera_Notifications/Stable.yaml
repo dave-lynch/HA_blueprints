@@ -1137,20 +1137,21 @@ actions:
               zone_order_satisfied: "{{ (zone_only and zone_multi and ordered_zones_match) if zone_order_enforced else true }}"
               zones_satisfied: "{{zone_single_satisfied and zone_multi_satisfied and zone_order_satisfied}}"
           - alias: "Send GenAI Notification"
-            conditions:
-              - condition: template
-                value_template: "{{ objects_satisfied }}"
-              - condition: template
-                value_template: "{{ zones_satisfied }}"
-            sequence:
-              - choose:
-                  - conditions: "{{ telegram }}"
-                    sequence:
-                      - action: telegram_bot.send_photo
-                        data:
-                          target: "{{telegram_chat_id}}"
-                          caption: "{{message}}"
-                          url: "{{attachment|replace( base_url, telegram_base_url )}}"
+            choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ objects_satisfied }}"
+                  - condition: template
+                    value_template: "{{ zones_satisfied }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ telegram }}"
+                        sequence:
+                          - action: telegram_bot.send_photo
+                            data:
+                              target: "{{telegram_chat_id}}"
+                              caption: "{{message}}"
+                              url: "{{attachment|replace( base_url, telegram_base_url )}}"
                   - conditions: "{{ not notify_group_target }}"
                     sequence:
                       - device_id: !input notify_device
