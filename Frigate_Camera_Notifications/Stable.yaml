@@ -1005,7 +1005,7 @@ variables:
   master_condition: !input master_condition
   # Dynamic Variables per event
   severity_satisfied: "{{input_severity|select('in', severity)|list|length > 0 if trigger.id == 'frigate-event'}}"
-  objects: "{{ trigger.payload_json['after']['data']['objects'] if trigger.id == 'frigate-event' }}"
+  objects: "{{ trigger.payload_json['after']['data']['objects'] if trigger.id in ['frigate-event', 'genai-event'] }}"
   objects_satisfied: "{{ not labels|length or labels|select('in', objects)|list|length > 0 or ('person-verified' in objects and 'person' in labels) }}"
   initial_home: "{{ presence_entity != '' and presence_entity|expand|selectattr('state','eq','home')|list|length != 0 }}"
   state_satisfied: "{{ not state_only or states(input_entity)|lower in states_filter }}"
@@ -1114,6 +1114,9 @@ actions:
               tv_interrupt: !input tv_interrupt
               attachment: !input attachment
               video: !input video
+              # Objects Variables (replicating Frigate object filtering)
+              objects: "{{ event['after']['data']['objects'] }}"
+              objects_satisfied: "{{ not labels|length or labels|select('in', objects)|list|length > 0 or ('person-verified' in objects and 'person' in labels) }}"
               # Zones Variables (replicating Frigate zone filtering)
               # If no zones defined, or any zones have been entered
               any_zones_entered: "{{ zones | length == 0 or ((zones | select('in', after_zones) | list | length) > 0) }}"
@@ -1135,6 +1138,8 @@ actions:
               zones_satisfied: "{{zone_single_satisfied and zone_multi_satisfied and zone_order_satisfied}}"
           - alias: "Send GenAI Notification"
             conditions:
+              - condition: template
+                value_template: "{{ objects_satisfied }}"
               - condition: template
                 value_template: "{{ zones_satisfied }}"
             sequence:
