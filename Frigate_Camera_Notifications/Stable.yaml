@@ -1089,7 +1089,7 @@ actions:
               icon: !input icon
               group: !input group
               #tag: "{{ review_id }}"
-              tag: "{{ review_id }}"
+              tag: "{{ event['after']['data']['detections'][0] }}"
               #group: "{{ group }}"
               channel: !input channel
               color: !input color
