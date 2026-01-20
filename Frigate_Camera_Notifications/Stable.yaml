@@ -1136,12 +1136,13 @@ actions:
               # Fails fast if prerequisite of zone or zone_multi is false, as they are pre-requisites
               zone_order_satisfied: "{{ (zone_only and zone_multi and ordered_zones_match) if zone_order_enforced else true }}"
               zones_satisfied: "{{zone_single_satisfied and zone_multi_satisfied and zone_order_satisfied}}"
-          - alias: "Send GenAI Notification"
-            choose:
+          - choose:
               - conditions:
-                  - condition: template
+                  - alias: "Object Filter"
+                    condition: template
                     value_template: "{{ objects_satisfied }}"
-                  - condition: template
+                  - alias: "Zone Filter"
+                    condition: template
                     value_template: "{{ zones_satisfied }}"
                 sequence:
                   - choose:
@@ -1152,111 +1153,111 @@ actions:
                               target: "{{telegram_chat_id}}"
                               caption: "{{message}}"
                               url: "{{attachment|replace( base_url, telegram_base_url )}}"
-                  - conditions: "{{ not notify_group_target }}"
-                    sequence:
-                      - device_id: !input notify_device
-                        domain: mobile_app
-                        type: notify
-                        title: "{{title}}"
-                        message: "{{message}}"
-                        data:
-                          tag: "{{ tag }}"
-                          group: "{{ camera | lower }}-frigate-notification }}"
-                          color: "{{color}}"
-                          # Android Specific
-                          subject: "{{subtitle}}"
-                          image: "{{attachment}}"
-                          video: "{{video}}"
-                          clickAction: "{{tap_action}}"
-                          ttl: 0
-                          priority: high
-                          notification_icon: "{{icon}}"
-                          sticky: "{{sticky}}"
-                          channel: "{{'alarm_stream' if critical else channel}}"
-                          car_ui: "{{android_auto}}"
-                          # iOS Specific
-                          subtitle: "{{subtitle}}"
-                          url: "{{tap_action}}"
-                          attachment:
-                            url: "{{video if video else attachment }}"
-                            content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'mp4' if 'mp4' in video else 'jpeg' if 'jpg' in attachment else 'gif' }}"
-                          push:
-                            sound:
-                              name: "{{sound}}"
-                              volume: "{{ iif(sound == 'none', 0, volume) }}"
-                              critical: "{{ iif(critical, 1, 0) }}"
-                          entity_id: "{{ios_live_view}}"
-                          # Actions
-                          actions:
-                            - action: URI
-                              title: "{{button_1}}"
-                              uri: "{{url_1}}"
-                              icon: "{{icon_1}}"
-                            - action: URI
-                              title: "{{button_2}}"
-                              uri: "{{url_2}}"
-                              icon: "{{icon_2}}"
-                            - action: "{{ 'URI' if '/' in url_3 else url_3 }}"
-                              title: "{{button_3}}"
-                              uri: "{{url_3}}"
-                              icon: "{{icon_3}}"
-                              destructive: true
-                  - conditions: "{{ tv }}"
-                    sequence:
-                      - action: "notify.{{ notify_group_target }}"
-                        data:
-                          title: "{{title}}"
-                          message: "{{message}}"
-                          data:
-                            tag: "{{ tag }}"
-                            group: "{{ camera | lower }}-frigate-notification }}"
-                            color: "{{color}}"
-                            # Android Specific
-                            subject: "{{subtitle}}"
-                            clickAction: "{{tap_action}}"
-                            ttl: 0
-                            priority: high
-                            notification_icon: "{{icon}}"
-                            sticky: "{{sticky}}"
-                            channel: "{{'alarm_stream' if critical else channel}}"
-                            car_ui: "{{android_auto}}"
-                            # Android/Fire TV
-                            image:
-                              #only send still images to TV
-                              url: "{{attachment | replace('review_preview.gif','snapshot.jpg') | replace('event_preview.gif','snapshot.jpg')}}"
-                            fontsize: "{{tv_size}}"
-                            position: "{{tv_position}}"
-                            duration: "{{tv_duration}}"
-                            transparency: "{{tv_transparency}}"
-                            interrupt: "{{tv_interrupt}}"
-                            timeout: 30
-                            # iOS Specific
-                            subtitle: "{{subtitle}}"
-                            url: "{{tap_action}}"
-                            attachment:
-                              url: "{{video if video else attachment }}"
-                              content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'mp4' if 'mp4' in video else 'jpeg' if 'jpg' in attachment else 'gif' }}"
-                            push:
-                              sound:
-                                name: "{{sound}}"
-                                volume: "{{ iif(sound == 'none', 0, volume) }}"
-                                critical: "{{ iif(critical, 1, 0) }}"
-                            entity_id: "{{ios_live_view}}"
-                            # Actions
-                            actions:
-                              - action: URI
-                                title: "{{button_1}}"
-                                uri: "{{url_1}}"
-                                icon: "{{icon_1}}"
-                              - action: URI
-                                title: "{{button_2}}"
-                                uri: "{{url_2}}"
-                                icon: "{{icon_2}}"
-                              - action: "{{ 'URI' if '/' in url_3 else url_3 }}"
-                                title: "{{button_3}}"
-                                uri: "{{url_3}}"
-                                icon: "{{icon_3}}"
-                                destructive: true
+                          - conditions: "{{ not notify_group_target }}"
+                            sequence:
+                              - device_id: !input notify_device
+                                domain: mobile_app
+                                type: notify
+                                title: "{{title}}"
+                                message: "{{message}}"
+                                data:
+                                  tag: "{{ tag }}"
+                                  group: "{{ camera | lower }}-frigate-notification }}"
+                                  color: "{{color}}"
+                                  # Android Specific
+                                  subject: "{{subtitle}}"
+                                  image: "{{attachment}}"
+                                  video: "{{video}}"
+                                  clickAction: "{{tap_action}}"
+                                  ttl: 0
+                                  priority: high
+                                  notification_icon: "{{icon}}"
+                                  sticky: "{{sticky}}"
+                                  channel: "{{'alarm_stream' if critical else channel}}"
+                                  car_ui: "{{android_auto}}"
+                                  # iOS Specific
+                                  subtitle: "{{subtitle}}"
+                                  url: "{{tap_action}}"
+                                  attachment:
+                                    url: "{{video if video else attachment }}"
+                                    content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'mp4' if 'mp4' in video else 'jpeg' if 'jpg' in attachment else 'gif' }}"
+                                  push:
+                                    sound:
+                                      name: "{{sound}}"
+                                      volume: "{{ iif(sound == 'none', 0, volume) }}"
+                                      critical: "{{ iif(critical, 1, 0) }}"
+                                  entity_id: "{{ios_live_view}}"
+                                  # Actions
+                                  actions:
+                                    - action: URI
+                                      title: "{{button_1}}"
+                                      uri: "{{url_1}}"
+                                      icon: "{{icon_1}}"
+                                    - action: URI
+                                      title: "{{button_2}}"
+                                      uri: "{{url_2}}"
+                                      icon: "{{icon_2}}"
+                                    - action: "{{ 'URI' if '/' in url_3 else url_3 }}"
+                                      title: "{{button_3}}"
+                                      uri: "{{url_3}}"
+                                      icon: "{{icon_3}}"
+                                      destructive: true
+                          - conditions: "{{ tv }}"
+                            sequence:
+                              - action: "notify.{{ notify_group_target }}"
+                                data:
+                                  title: "{{title}}"
+                                  message: "{{message}}"
+                                  data:
+                                    tag: "{{ tag }}"
+                                    group: "{{ camera | lower }}-frigate-notification }}"
+                                    color: "{{color}}"
+                                    # Android Specific
+                                    subject: "{{subtitle}}"
+                                    clickAction: "{{tap_action}}"
+                                    ttl: 0
+                                    priority: high
+                                    notification_icon: "{{icon}}"
+                                    sticky: "{{sticky}}"
+                                    channel: "{{'alarm_stream' if critical else channel}}"
+                                    car_ui: "{{android_auto}}"
+                                    # Android/Fire TV
+                                    image:
+                                      #only send still images to TV
+                                      url: "{{attachment | replace('review_preview.gif','snapshot.jpg') | replace('event_preview.gif','snapshot.jpg')}}"
+                                    fontsize: "{{tv_size}}"
+                                    position: "{{tv_position}}"
+                                    duration: "{{tv_duration}}"
+                                    transparency: "{{tv_transparency}}"
+                                    interrupt: "{{tv_interrupt}}"
+                                    timeout: 30
+                                    # iOS Specific
+                                    subtitle: "{{subtitle}}"
+                                    url: "{{tap_action}}"
+                                    attachment:
+                                      url: "{{video if video else attachment }}"
+                                      content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'mp4' if 'mp4' in video else 'jpeg' if 'jpg' in attachment else 'gif' }}"
+                                    push:
+                                      sound:
+                                        name: "{{sound}}"
+                                        volume: "{{ iif(sound == 'none', 0, volume) }}"
+                                        critical: "{{ iif(critical, 1, 0) }}"
+                                    entity_id: "{{ios_live_view}}"
+                                    # Actions
+                                    actions:
+                                      - action: URI
+                                        title: "{{button_1}}"
+                                        uri: "{{url_1}}"
+                                        icon: "{{icon_1}}"
+                                      - action: URI
+                                        title: "{{button_2}}"
+                                        uri: "{{url_2}}"
+                                        icon: "{{icon_2}}"
+                                      - action: "{{ 'URI' if '/' in url_3 else url_3 }}"
+                                        title: "{{button_3}}"
+                                        uri: "{{url_3}}"
+                                        icon: "{{icon_3}}"
+                                        destructive: true
                 default:
                   - action: "notify.{{ notify_group_target }}"
                     data:
