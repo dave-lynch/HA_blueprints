@@ -1087,10 +1087,9 @@ actions:
               critical_input: !input critical
               critical: "{{ true if critical_input == 'true' else true if critical_input == True else false }}"
               icon: !input icon
-              group: !input group
-              #tag: "{{ review_id }}"
-              tag: "{{ event['after']['data']['detections'][0] }}"
-              #group: "{{ group }}"
+              group: "{{ camera | lower }}-frigate-notification }}"
+              tag: "{{ review_id }}"
+              #group: "{{ camera | lower }}-frigate-notification }}"
               channel: !input channel
               color: !input color
               sticky: !input sticky
@@ -1134,7 +1133,7 @@ actions:
                         message: "{{message}}"
                         data:
                           tag: "{{ tag }}"
-                          group: "{{ group }}"
+                          group: "{{ camera | lower }}-frigate-notification }}"
                           color: "{{color}}"
                           # Android Specific
                           subject: "{{subtitle}}"
@@ -1182,7 +1181,7 @@ actions:
                           message: "{{message}}"
                           data:
                             tag: "{{ tag }}"
-                            group: "{{ group }}"
+                            group: "{{ camera | lower }}-frigate-notification }}"
                             color: "{{color}}"
                             # Android Specific
                             subject: "{{subtitle}}"
@@ -1237,7 +1236,7 @@ actions:
                       message: "{{message}}"
                       data:
                         tag: "{{ tag }}"
-                        group: "{{ group }}"
+                        group: "{{ camera | lower }}-frigate-notification }}"
                         color: "{{color}}"
                         # Android Specific
                         subject: "{{subtitle}}"
@@ -1292,7 +1291,7 @@ actions:
               event: "{{ trigger.payload_json }}"
               detections: "{{ event['after']['data']['detections'] }}"
               review_id: "{{event['after']['id']}}"
-              id: "{{ detections[0] }}"
+              id: "{{ review_id }}"
               objects: "{{ event['after']['data']['objects'] }}"
               sub_labels: "{{ event['after']['data']['sub_labels'] }}"
               label: >-
@@ -1366,7 +1365,7 @@ actions:
               tts_helper: !input tts_helper
               custom_filter: !input custom_filter
               icon: !input icon
-              group: !input group
+              group: "{{ camera | lower }}-frigate-notification }}"
               channel: !input channel
               attachment: !input attachment
               video: !input video
@@ -1499,8 +1498,8 @@ actions:
                                 title: "{{title}}"
                                 message: "{{message}}"
                                 data:
-                                  tag: "{{ id }}"
-                                  group: "{{ group }}"
+                                  tag: "{{ review_id }}"
+                                  group: "{{ camera | lower }}-frigate-notification }}"
                                   color: "{{color}}"
                                   # Android Specific
                                   subject: "{{subtitle}}"
@@ -1547,8 +1546,8 @@ actions:
                                   title: "{{title}}"
                                   message: "{{message}}"
                                   data:
-                                    tag: "{{ id }}"
-                                    group: "{{ group }}"
+                                    tag: "{{ review_id }}"
+                                    group: "{{ camera | lower }}-frigate-notification }}"
                                     color: "{{color}}"
                                     # Android Specific
                                     subject: "{{subtitle}}"
@@ -1602,8 +1601,8 @@ actions:
                               title: "{{title}}"
                               message: "{{message}}"
                               data:
-                                tag: "{{ id }}"
-                                group: "{{ group }}"
+                                tag: "{{ review_id }}"
+                                group: "{{ camera | lower }}-frigate-notification }}"
                                 color: "{{color}}"
                                 # Android Specific
                                 subject: "{{subtitle}}"
@@ -1968,8 +1967,8 @@ actions:
                                       title: "{{title}}"
                                       message: "{{message}}"
                                       data:
-                                        tag: "{{ id }}"
-                                        group: "{{ group }}"
+                                        tag: "{{ review_id }}"
+                                        group: "{{ camera | lower }}-frigate-notification }}"
                                         color: "{{color}}"
                                         # Android Specific
                                         subject: "{{subtitle}}"
@@ -2017,8 +2016,8 @@ actions:
                                         title: "{{title}}"
                                         message: "{{message}}"
                                         data:
-                                          tag: "{{ id }}"
-                                          group: "{{ group }}"
+                                          tag: "{{ review_id }}"
+                                          group: "{{ camera | lower }}-frigate-notification }}"
                                           color: "{{color}}"
                                           # Android Specific
                                           subject: "{{subtitle}}"
@@ -2073,8 +2072,8 @@ actions:
                                     title: "{{title}}"
                                     message: "{{message}}"
                                     data:
-                                      tag: "{{ id }}"
-                                      group: "{{ group }}"
+                                      tag: "{{ review_id }}"
+                                      group: "{{ camera | lower }}-frigate-notification }}"
                                       color: "{{color}}"
                                       # Android Specific
                                       subject: "{{subtitle}}"
