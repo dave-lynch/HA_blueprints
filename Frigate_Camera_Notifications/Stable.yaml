@@ -1063,7 +1063,7 @@ actions:
               event: "{{ trigger.payload_json }}"
               metadata: "{{ event['after']['data']['metadata'] | default({}) }}"
               review_id: "{{ event['after']['id'] }}"
-              id: "{{ review_id }}"c
+              id: "{{ review_id }}"
               camera: "{{ event['after']['camera'] | lower }}"
               genai_title: "{{ metadata.title | default('') }}"
               genai_shortSummary: "{{ metadata.shortSummary | default('') }}"
