@@ -1138,12 +1138,8 @@ actions:
               zones_satisfied: "{{zone_single_satisfied and zone_multi_satisfied and zone_order_satisfied}}"
           - choose:
               - conditions:
-                  - alias: "Object Filter"
-                    condition: template
-                    value_template: "{{ objects_satisfied }}"
-                  - alias: "Zone Filter"
-                    condition: template
-                    value_template: "{{ zones_satisfied }}"
+                  - condition: template
+                    value_template: "{{ objects_satisfied and zones_satisfied }}"
                 sequence:
                   - choose:
                       - conditions: "{{ telegram }}"
