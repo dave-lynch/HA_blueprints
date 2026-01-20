@@ -1077,7 +1077,7 @@ actions:
                   {{ genai_title }}
                 {% endif %}
               message: "{{ genai_shortSummary }}"
-              subtitle: !input subtitle
+              subtitle: "{{ metadata.time }}"
               critical_input: !input critical
               critical: "{{ true if critical_input == 'true' else true if critical_input == True else false }}"
               icon: !input icon
