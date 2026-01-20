@@ -1010,7 +1010,7 @@ variables:
   initial_home: "{{ presence_entity != '' and presence_entity|expand|selectattr('state','eq','home')|list|length != 0 }}"
   state_satisfied: "{{ not state_only or states(input_entity)|lower in states_filter }}"
   before_zones: "{{ trigger.payload_json['before']['data']['zones'] if trigger.id == 'frigate-event' }}"
-  after_zones: "{{ trigger.payload_json['after']['data']['zones'] if trigger.id == 'frigate-event' }}"
+  after_zones: "{{ trigger.payload_json['after']['data']['zones'] if trigger.id in ['frigate-event', 'genai-event'] }}"
   zone_multi_filter: "{{zone_only and zone_multi and after_zones|length and zones and zones |reject('in', after_zones) |list |length == 0 }}"
 conditions:
   condition: or
@@ -1114,7 +1114,29 @@ actions:
               tv_interrupt: !input tv_interrupt
               attachment: !input attachment
               video: !input video
+              # Zones Variables (replicating Frigate zone filtering)
+              # If no zones defined, or any zones have been entered
+              any_zones_entered: "{{ zones | length == 0 or ((zones | select('in', after_zones) | list | length) > 0) }}"
+              zone_single_satisfied: "{{ any_zones_entered if zone_only else true}}"
+              # If no zones defined, or all zones have been entered
+              all_zones_entered: "{{ zones | length == 0 or ((zones | reject('in', after_zones) | list | length) == 0) }}"
+              zone_multi_satisfied: "{{ all_zones_entered if zone_only and zone_multi else true}}"
+              # Compare the joined strings for equality is the simplest solution, due to both variables being defined in band.
+              ordered_zones_match: >
+                {% set ns = namespace(intersection=[]) %}
+                {% for item in after_zones %}
+                    {% if item in zones %}
+                        {% set ns.intersection = ns.intersection + [item] %}
+                    {% endif %}
+                {% endfor %}
+                {{ ns.intersection == zones }}
+              # Fails fast if prerequisite of zone or zone_multi is false, as they are pre-requisites
+              zone_order_satisfied: "{{ (zone_only and zone_multi and ordered_zones_match) if zone_order_enforced else true }}"
+              zones_satisfied: "{{zone_single_satisfied and zone_multi_satisfied and zone_order_satisfied}}"
           - alias: "Send GenAI Notification"
+            conditions:
+              - condition: template
+                value_template: "{{ zones_satisfied }}"
             sequence:
               - choose:
                   - conditions: "{{ telegram }}"
