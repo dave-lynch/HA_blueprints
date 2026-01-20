@@ -942,7 +942,13 @@ triggers:
 variables:
   input_camera: !input camera
   input_camera_name: "{{input_camera|expand|map(attribute='attributes.camera_name', default='none')|list}}"
-  camera: "{{trigger.payload_json['after']['camera'] if trigger.id == 'frigate-event'}}"
+  #camera: "{{trigger.payload_json['after']['camera'] if trigger.id == 'frigate-event'}}"
+  camera: >-
+    {% if trigger.id in ['frigate-event', 'genai-event'] %}
+      {{ trigger.payload_json['after']['camera'] }}
+    {% else %}
+      {{ camera }}
+    {% endif %}
   camera_name: "{{ camera | replace('_', ' ') | title }}"
   input_severity: !input review_severity
   severity: "{{trigger.payload_json['after']['severity'] if trigger.id == 'frigate-event'}}"
