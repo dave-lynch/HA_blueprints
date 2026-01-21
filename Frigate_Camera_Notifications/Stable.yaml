@@ -1182,8 +1182,9 @@ actions:
                               subtitle: "{{subtitle}}"
                               url: "{{tap_action}}"
                               attachment:
-                                url: "{{video if video else attachment }}"
-                                content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'mp4' if 'mp4' in video else 'jpeg' if 'jpg' in attachment else 'gif' }}"
+                                # For iOS, prefer m3u8 over mp4, and fall back to attachment if video contains mp4 (which may not be ready)
+                                url: "{{ video if video and 'm3u8' in video else (attachment if video and 'mp4' in video else (video if video else attachment)) }}"
+                                content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in (video if video else attachment) else 'jpeg' }}"
                               push:
                                 sound:
                                   name: "{{sound}}"
@@ -1238,8 +1239,9 @@ actions:
                                 subtitle: "{{subtitle}}"
                                 url: "{{tap_action}}"
                                 attachment:
-                                  url: "{{video if video else attachment }}"
-                                  content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'mp4' if 'mp4' in video else 'jpeg' if 'jpg' in attachment else 'gif' }}"
+                                  # Avoid MP4 for iOS (may not be ready, iOS has issues) - use attachment (snapshot) instead
+                                  url: "{{ attachment if video and 'mp4' in video else (video if video else attachment) }}"
+                                  content-type: "{{ 'application/vnd.apple.mpegurl' if video and 'm3u8' in video else 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in (video if video else attachment) else 'jpeg' }}"
                                 push:
                                   sound:
                                     name: "{{sound}}"
@@ -1659,8 +1661,9 @@ actions:
                                 # iOS Specific
                                 url: "{{tap_action}}"
                                 attachment:
-                                  url: "{{video if video else attachment }}"
-                                  content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'mp4' if 'mp4' in video else 'jpeg' if 'jpg' in attachment else 'gif' }}"
+                                  # Avoid MP4 for iOS (may not be ready, iOS has issues) - use attachment (snapshot) instead
+                                  url: "{{ attachment if video and 'mp4' in video else (video if video else attachment) }}"
+                                  content-type: "{{ 'application/vnd.apple.mpegurl' if video and 'm3u8' in video else 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in (video if video else attachment) else 'jpeg' }}"
                                 push:
                                   sound:
                                     name: "{{sound}}"
@@ -1731,8 +1734,8 @@ actions:
                     attachment_2: !input attachment_2
                     attachment: "{{iif(attachment_2, attachment_2, attachment)}}"
 
-                    event: "{{ wait.trigger.payload_json }}"
-                    type: "{{event['type']}}"
+                    event: "{{ wait.trigger.payload_json if wait.trigger else {}}}"
+                    type: "{{event['type'] if wait.trigger else 'timeout'}}"
 
                     initial_severity: "{{severity}}"
                     old_objects: "{{objects}}"
@@ -1740,21 +1743,21 @@ actions:
                     # Sometimes mqtt messages are missed so we keep the previous iteration severity, objects and zones to compare against the new ones,
                     # rather than comparing the new before and after which may match despite a change between mqtt messages
 
-                    severity: "{{event['after']['severity']}}"
-                    severity_updated: "{{initial_severity != severity}}"
-                    severity_satisfied: "{{((input_severity | select('equalto', severity) | list | length) > 0) }}"
+                    severity: "{{event['after']['severity'] if wait.trigger and event.get('after') else severity}}"
+                    severity_updated: "{{initial_severity != severity if wait.trigger else false}}"
+                    severity_satisfied: "{{((input_severity | select('equalto', severity) | list | length) > 0) if wait.trigger else true }}"
 
-                    objects: "{{ event['after']['data']['objects'] }}"
+                    objects: "{{ event['after']['data']['objects'] if wait.trigger and event.get('after') else objects }}"
                     objects_satisfied: "{{ not labels|length or labels|select('in', objects)|list|length > 0 or ('person-verified' in objects and 'person' in labels) }}"
                     #loitering: "{{ loiter_timer and event['before']['motionless_count']/fps/60 < loiter_timer and event['after']['motionless_count']/fps/60 >= loiter_timer }}"
                     home: "{{presence_entity |reject('in', '') |select('is_state', 'home') |list |length != 0 }}"
                     #new_snapshot: "{{ update_thumbnail and event['before']['snapshot']['frame_time'] != event['after']['snapshot']['frame_time'] }}"
-                    presence_changed: "{{ presence_entity |reject('in', '') |expand |map(attribute='last_changed') |list |select('gt', as_datetime(event['before']['start_time'])) |list |length != 0 }}"
+                    presence_changed: "{{ presence_entity |reject('in', '') |expand |map(attribute='last_changed') |list |select('gt', as_datetime(event['before']['start_time'])) |list |length != 0 if wait.trigger and event.get('before') else false }}"
 
                     # Zones Variables
 
-                    before_zones: "{{ event['before']['data']['zones'] | default([]) }}"
-                    after_zones: "{{ event['after']['data']['zones'] | default([]) }}"
+                    before_zones: "{{ event['before']['data']['zones'] | default([]) if wait.trigger and event.get('before') else last_zones }}"
+                    after_zones: "{{ event['after']['data']['zones'] | default([]) if wait.trigger and event.get('after') else after_zones }}"
                     # If no zones defined, or any zones have been entered
                     any_zones_entered: "{{ zones | length == 0 or ((zones | select('in', after_zones) | list | length) > 0) }}"
                     zone_single_satisfied: "{{ any_zones_entered if zone_only else true}}"
@@ -2187,4 +2190,4 @@ actions:
                                         {{ newIds[:250] }}
                                     target:
                                       entity_id: "{{tts_helper}}"
-              until: "{{ not wait.trigger or wait.trigger.payload_json['type'] == 'end' }}"
+              until: "{{ not wait.trigger or (wait.trigger and wait.trigger.payload_json['type'] == 'end') }}"
