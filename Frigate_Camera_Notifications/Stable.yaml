@@ -1069,7 +1069,10 @@ actions:
               event: "{{ trigger.payload_json }}"
               metadata: "{{ event['after']['data']['metadata'] | default({}) }}"
               review_id: "{{ event['after']['id'] }}"
-              id: "{{ review_id }}"
+              # Use detection/event ID for snapshots/clips, review_id for review_preview.gif
+              # Check if detections exist and have IDs, otherwise use review_id
+              detections: "{{ event['after']['data']['detections'] | default([]) }}"
+              id: "{{ detections[0]['id'] if detections and detections|length > 0 and detections[0].get('id') else review_id }}"
               camera: "{{ event['after']['camera'] | lower }}"
               genai_title: "{{ metadata.title | default('') }}"
               genai_shortSummary: "{{ metadata.shortSummary | default('') }}"
@@ -1320,7 +1323,9 @@ actions:
               event: "{{ trigger.payload_json }}"
               detections: "{{ event['after']['data']['detections'] }}"
               review_id: "{{event['after']['id']}}"
-              id: "{{ review_id }}"
+              # Use detection/event ID for snapshots/clips, review_id for review_preview.gif
+              # If detections exist, use first detection's ID, otherwise fall back to review_id
+              id: "{{ detections[0]['id'] if detections and detections|length > 0 and detections[0].get('id') else review_id }}"
               objects: "{{ event['after']['data']['objects'] }}"
               sub_labels: "{{ event['after']['data']['sub_labels'] }}"
               label: >-
