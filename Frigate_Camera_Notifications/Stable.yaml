@@ -1182,9 +1182,10 @@ actions:
                               subtitle: "{{subtitle}}"
                               url: "{{tap_action}}"
                               attachment:
-                                # For iOS, prefer m3u8 over mp4, and fall back to attachment if video contains mp4 (which may not be ready)
-                                url: "{{ video if video and 'm3u8' in video else (attachment if video and 'mp4' in video else (video if video else attachment)) }}"
-                                content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in (video if video else attachment) else 'jpeg' }}"
+                                # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
+                                # Snapshots are always available immediately, unlike GIFs/videos which may not be ready
+                                url: "{{ attachment }}"
+                                content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
                               push:
                                 sound:
                                   name: "{{sound}}"
@@ -1239,9 +1240,9 @@ actions:
                                 subtitle: "{{subtitle}}"
                                 url: "{{tap_action}}"
                                 attachment:
-                                  # Avoid MP4 for iOS (may not be ready, iOS has issues) - use attachment (snapshot) instead
-                                  url: "{{ attachment if video and 'mp4' in video else (video if video else attachment) }}"
-                                  content-type: "{{ 'application/vnd.apple.mpegurl' if video and 'm3u8' in video else 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in (video if video else attachment) else 'jpeg' }}"
+                                  # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
+                                  url: "{{ attachment }}"
+                                  content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
                                 push:
                                   sound:
                                     name: "{{sound}}"
@@ -1293,8 +1294,9 @@ actions:
                             # iOS Specific
                             url: "{{tap_action}}"
                             attachment:
-                              url: "{{video if video else attachment }}"
-                              content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'mp4' if 'mp4' in video else 'jpeg' if 'jpg' in attachment else 'gif' }}"
+                              # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
+                              url: "{{ attachment }}"
+                              content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
                             push:
                               sound:
                                 name: "{{sound}}"
@@ -1552,8 +1554,9 @@ actions:
                                   subtitle: "{{subtitle}}"
                                   url: "{{tap_action}}"
                                   attachment:
-                                    url: "{{video if video else attachment }}"
-                                    content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'mp4' if 'mp4' in video else 'jpeg' if 'jpg' in attachment else 'gif' }}"
+                                    # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
+                                    url: "{{ attachment }}"
+                                    content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
                                   push:
                                     sound:
                                       name: "{{sound}}"
@@ -1608,8 +1611,9 @@ actions:
                                     subtitle: "{{subtitle}}"
                                     url: "{{tap_action}}"
                                     attachment:
-                                      url: "{{video if video else attachment }}"
-                                      content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'mp4' if 'mp4' in video else 'jpeg' if 'jpg' in attachment else 'gif' }}"
+                                      # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
+                                      url: "{{ attachment }}"
+                                      content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
                                     push:
                                       sound:
                                         name: "{{sound}}"
@@ -1661,9 +1665,9 @@ actions:
                                 # iOS Specific
                                 url: "{{tap_action}}"
                                 attachment:
-                                  # Avoid MP4 for iOS (may not be ready, iOS has issues) - use attachment (snapshot) instead
-                                  url: "{{ attachment if video and 'mp4' in video else (video if video else attachment) }}"
-                                  content-type: "{{ 'application/vnd.apple.mpegurl' if video and 'm3u8' in video else 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in (video if video else attachment) else 'jpeg' }}"
+                                  # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
+                                  url: "{{ attachment }}"
+                                  content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
                                 push:
                                   sound:
                                     name: "{{sound}}"
@@ -2023,8 +2027,9 @@ actions:
                                         subtitle: "{{subtitle}}"
                                         url: "{{tap_action}}"
                                         attachment:
-                                          url: "{{video if video else attachment }}"
-                                          content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'mp4' if 'mp4' in video else 'jpeg' if 'jpg' in attachment else 'gif' }}"
+                                          # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
+                                          url: "{{ attachment }}"
+                                          content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
                                         push:
                                           sound:
                                             name: "{{ iif(silent_update, 'none', sound) }}"
@@ -2080,8 +2085,9 @@ actions:
                                           subtitle: "{{subtitle}}"
                                           url: "{{tap_action}}"
                                           attachment:
-                                            url: "{{video if video else attachment }}"
-                                            content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'mp4' if 'mp4' in video else 'jpeg' if 'jpg' in attachment else 'gif' }}"
+                                            # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
+                                            url: "{{ attachment }}"
+                                            content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
                                           push:
                                             sound:
                                               name: "{{ iif(silent_update, 'none', sound) }}"
@@ -2134,8 +2140,9 @@ actions:
                                       subtitle: "{{subtitle}}"
                                       url: "{{tap_action}}"
                                       attachment:
-                                        url: "{{video if video else attachment }}"
-                                        content-type: "{{ 'application/vnd.apple.mpegurl' if 'm3u8' in video else 'mp4' if 'mp4' in video else 'jpeg' if 'jpg' in attachment else 'gif' }}"
+                                        # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
+                                        url: "{{ attachment }}"
+                                        content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
                                       push:
                                         sound:
                                           name: "{{ iif(silent_update, 'none', sound) }}"
