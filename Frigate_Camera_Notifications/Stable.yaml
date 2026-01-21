@@ -1062,8 +1062,8 @@ actions:
         conditions:
           - condition: trigger
             id: "genai-event"
-          - condition: template
-            value_template: "{{ trigger.payload_json['type'] == 'genai' }}"
+          # - condition: template
+          #   value_template: "{{ trigger.payload_json['type'] == 'genai' }}"
         sequence:
           - variables:
               event: "{{ trigger.payload_json }}"
@@ -1116,6 +1116,7 @@ actions:
               tv_transparency: !input tv_transparency
               tv_interrupt: !input tv_interrupt
               attachment: !input attachment
+              attachment_2: !input attachment_2
               video: !input video
               # Extract objects and zones from genai event (same structure as frigate events)
               objects: "{{ event['after']['data']['objects'] | default([]) }}"
@@ -1185,7 +1186,7 @@ actions:
                                 # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
                                 # Snapshots are always available immediately, unlike GIFs/videos which may not be ready
                                 url: "{{ attachment }}"
-                                content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
+                                content-type: "{{ 'image/jpeg' if 'jpg' in attachment|lower or 'jpeg' in attachment|lower else 'image/gif' if 'gif' in attachment|lower else 'image/jpeg' }}"                              
                               push:
                                 sound:
                                   name: "{{sound}}"
@@ -1242,7 +1243,7 @@ actions:
                                 attachment:
                                   # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
                                   url: "{{ attachment }}"
-                                  content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
+                                  content-type: "{{ 'image/jpeg' if 'jpg' in attachment|lower or 'jpeg' in attachment|lower else 'image/gif' if 'gif' in attachment|lower else 'image/jpeg' }}"
                                 push:
                                   sound:
                                     name: "{{sound}}"
@@ -1296,7 +1297,7 @@ actions:
                             attachment:
                               # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
                               url: "{{ attachment }}"
-                              content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
+                              content-type: "{{ 'image/jpeg' if 'jpg' in attachment|lower or 'jpeg' in attachment|lower else 'image/gif' if 'gif' in attachment|lower else 'image/jpeg' }}"
                             push:
                               sound:
                                 name: "{{sound}}"
@@ -1556,7 +1557,7 @@ actions:
                                   attachment:
                                     # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
                                     url: "{{ attachment }}"
-                                    content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
+                                    content-type: "{{ 'image/jpeg' if 'jpg' in attachment|lower or 'jpeg' in attachment|lower else 'image/gif' if 'gif' in attachment|lower else 'image/jpeg' }}"
                                   push:
                                     sound:
                                       name: "{{sound}}"
@@ -1613,7 +1614,7 @@ actions:
                                     attachment:
                                       # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
                                       url: "{{ attachment }}"
-                                      content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
+                                      content-type: "{{ 'image/jpeg' if 'jpg' in attachment|lower or 'jpeg' in attachment|lower else 'image/gif' if 'gif' in attachment|lower else 'image/jpeg' }}"
                                     push:
                                       sound:
                                         name: "{{sound}}"
@@ -1667,7 +1668,7 @@ actions:
                                 attachment:
                                   # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
                                   url: "{{ attachment }}"
-                                  content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
+                                  content-type: "{{ 'image/jpeg' if 'jpg' in attachment|lower or 'jpeg' in attachment|lower else 'image/gif' if 'gif' in attachment|lower else 'image/jpeg' }}"
                                 push:
                                   sound:
                                     name: "{{sound}}"
@@ -2029,7 +2030,7 @@ actions:
                                         attachment:
                                           # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
                                           url: "{{ attachment }}"
-                                          content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
+                                          content-type: "{{ 'image/jpeg' if 'jpg' in attachment|lower or 'jpeg' in attachment|lower else 'image/gif' if 'gif' in attachment|lower else 'image/jpeg' }}"
                                         push:
                                           sound:
                                             name: "{{ iif(silent_update, 'none', sound) }}"
@@ -2087,7 +2088,7 @@ actions:
                                           attachment:
                                             # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
                                             url: "{{ attachment }}"
-                                            content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
+                                            content-type: "{{ 'image/jpeg' if 'jpg' in attachment|lower or 'jpeg' in attachment|lower else 'image/gif' if 'gif' in attachment|lower else 'image/jpeg' }}"
                                           push:
                                             sound:
                                               name: "{{ iif(silent_update, 'none', sound) }}"
@@ -2142,7 +2143,7 @@ actions:
                                       attachment:
                                         # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
                                         url: "{{ attachment }}"
-                                        content-type: "{{ 'jpeg' if 'jpg' in attachment else 'gif' if 'gif' in attachment else 'jpeg' }}"
+                                        content-type: "{{ 'image/jpeg' if 'jpg' in attachment|lower or 'jpeg' in attachment|lower else 'image/gif' if 'gif' in attachment|lower else 'image/jpeg' }}"
                                       push:
                                         sound:
                                           name: "{{ iif(silent_update, 'none', sound) }}"
