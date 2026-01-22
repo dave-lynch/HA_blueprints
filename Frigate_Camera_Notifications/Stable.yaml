@@ -1138,8 +1138,10 @@ actions:
               zones_satisfied: "{{zone_single_satisfied and zone_multi_satisfied and zone_order_satisfied}}"
               # Attachment variables - set after all event-specific variables (id, review_id, etc.) are available
               # This ensures attachment templates (which use {{id}}, {{review_id}}, etc.) are evaluated correctly
-              attachment: !input attachment
-              attachment_2: !input attachment_2
+              attachment_input: !input attachment
+              attachment: "{{ attachment_input }}"
+              attachment_2_input: !input attachment_2
+              attachment_2: "{{ attachment_2_input }}"
               video: !input video
           - alias: "Send GenAI Notification"
             choose:
