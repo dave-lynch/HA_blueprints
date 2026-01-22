@@ -1584,7 +1584,7 @@ actions:
                                     icon: "{{icon_3}}"
                                     destructive: true
                       - conditions: "{{ tv }}"
-                            sequence:
+                        sequence:
                               - action: "notify.{{ notify_group_target }}"
                                 data:
                                   title: "{{title}}"
