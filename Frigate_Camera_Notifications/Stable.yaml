@@ -1190,7 +1190,7 @@ actions:
                                 # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
                                 # Snapshots are always available immediately, unlike GIFs/videos which may not be ready
                                 url: "{{ attachment }}"
-                                content-type: "{{ 'image/jpeg' if 'jpg' in attachment|lower or 'jpeg' in attachment|lower else 'image/gif' if 'gif' in attachment|lower else 'image/jpeg' }}"                              
+                                content-type: "{{ 'image/gif' if '.gif' in attachment|lower else 'image/jpeg' }}"                              
                               push:
                                 sound:
                                   name: "{{sound}}"
@@ -1301,7 +1301,7 @@ actions:
                             attachment:
                               # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
                               url: "{{ attachment }}"
-                              content-type: "{{ 'image/jpeg' if 'jpg' in attachment|lower or 'jpeg' in attachment|lower else 'image/gif' if 'gif' in attachment|lower else 'image/jpeg' }}"
+                              content-type: "{{ 'image/gif' if '.gif' in attachment|lower else 'image/jpeg' }}"
                             push:
                               sound:
                                 name: "{{sound}}"
@@ -1556,34 +1556,34 @@ actions:
                                   channel: "{{'alarm_stream' if critical else channel}}"
                                   car_ui: "{{android_auto}}"
                                   # iOS Specific
-                                  subtitle: "{{subtitle}}"
-                                  url: "{{tap_action}}"
-                                  attachment:
-                                    # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
-                                    url: "{{ attachment }}"
-                                    content-type: "{{ 'image/jpeg' if 'jpg' in attachment|lower or 'jpeg' in attachment|lower else 'image/gif' if 'gif' in attachment|lower else 'image/jpeg' }}"
-                                  push:
-                                    sound:
-                                      name: "{{sound}}"
-                                      volume: "{{ iif(sound == 'none', 0, volume) }}"
-                                      critical: "{{ iif(critical, 1, 0) }}"
-                                  entity_id: "{{ios_live_view}}"
-                                  # Actions
-                                  actions:
-                                    - action: URI
-                                      title: "{{button_1}}"
-                                      uri: "{{url_1}}"
-                                      icon: "{{icon_1}}"
-                                    - action: URI
-                                      title: "{{button_2}}"
-                                      uri: "{{url_2}}"
-                                      icon: "{{icon_2}}"
-                                    - action: "{{ 'URI' if '/' in url_3 else url_3 }}"
-                                      title: "{{button_3}}"
-                                      uri: "{{url_3}}"
-                                      icon: "{{icon_3}}"
-                                      destructive: true
-                          - conditions: "{{ tv }}"
+                                subtitle: "{{subtitle}}"
+                                url: "{{tap_action}}"
+                                attachment:
+                                  # For iOS long-press preview, always use attachment (snapshot) to avoid 404s
+                                  url: "{{ attachment }}"
+                                  content-type: "{{ 'image/gif' if '.gif' in attachment|lower else 'image/jpeg' }}"
+                                push:
+                                  sound:
+                                    name: "{{sound}}"
+                                    volume: "{{ iif(sound == 'none', 0, volume) }}"
+                                    critical: "{{ iif(critical, 1, 0) }}"
+                                entity_id: "{{ios_live_view}}"
+                                # Actions
+                                actions:
+                                  - action: URI
+                                    title: "{{button_1}}"
+                                    uri: "{{url_1}}"
+                                    icon: "{{icon_1}}"
+                                  - action: URI
+                                    title: "{{button_2}}"
+                                    uri: "{{url_2}}"
+                                    icon: "{{icon_2}}"
+                                  - action: "{{ 'URI' if '/' in url_3 else url_3 }}"
+                                    title: "{{button_3}}"
+                                    uri: "{{url_3}}"
+                                    icon: "{{icon_3}}"
+                                    destructive: true
+                      - conditions: "{{ tv }}"
                             sequence:
                               - action: "notify.{{ notify_group_target }}"
                                 data:
