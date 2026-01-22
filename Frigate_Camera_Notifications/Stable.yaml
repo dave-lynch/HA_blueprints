@@ -1115,9 +1115,6 @@ actions:
               tv_duration: !input tv_duration
               tv_transparency: !input tv_transparency
               tv_interrupt: !input tv_interrupt
-              attachment: !input attachment
-              attachment_2: !input attachment_2
-              video: !input video
               # Extract objects and zones from genai event (same structure as frigate events)
               objects: "{{ event['after']['data']['objects'] | default([]) }}"
               before_zones: "{{ event['before']['data']['zones'] | default([]) }}"
@@ -1139,6 +1136,11 @@ actions:
                 {{ ns.intersection == zones }}
               zone_order_satisfied: "{{ (zone_only and zone_multi and ordered_zones_match) if zone_order_enforced else true }}"
               zones_satisfied: "{{zone_single_satisfied and zone_multi_satisfied and zone_order_satisfied}}"
+              # Attachment variables - set after all event-specific variables (id, review_id, etc.) are available
+              # This ensures attachment templates (which use {{id}}, {{review_id}}, etc.) are evaluated correctly
+              attachment: !input attachment
+              attachment_2: !input attachment_2
+              video: !input video
           - alias: "Send GenAI Notification"
             choose:
               - conditions:
