@@ -19,6 +19,10 @@ With this blueprint, you may send the notification to multiple devices by leavin
 - An MQTT broker connected to home assistant and frigate.
 - Minimum iOS Version: 15.0
 
+### Additional Resources
+
+- [Frigate 0.17 Feature Review and Automation Suggestions](Frigate_0.17_Feature_Review_and_Automation_Suggestions.md)
+
 ### Required entities:
 
 - [Frigate Camera Name](https://github.com/SgtBatten/HA_blueprints/blob/main/Frigate%20Camera%20Notifications/Guide:%20Configuration%20Options.md#frigate-camera)
