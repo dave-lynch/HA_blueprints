@@ -1764,37 +1764,37 @@ actions:
                       uri: '{{url_3}}'
                       icon: '{{icon_3}}'
                       destructive: true
-                default:
-                - action: notify.{{ notify_group_target }}
-                  data:
-                    title: '{{title}}'
-                    message: '{{message}}'
-                    data:
-                      tag: '{{ review_id }}'
-                      group: '{{ camera | lower }}-frigate-notification }}'
-                      color: '{{color}}'
-                      subject: '{{subtitle}}'
-                      image: '{{attachment}}'
-                      video: '{{video}}'
-                      clickAction: '{{tap_action}}'
-                      ttl: 0
-                      priority: high
-                      notification_icon: '{{icon}}'
-                      sticky: '{{sticky}}'
-                      channel: '{{''alarm_stream'' if critical else channel}}'
-                      car_ui: '{{android_auto}}'
-                      subtitle: '{{subtitle}}'
-                      fontsize: '{{tv_size}}'
-                      position: '{{tv_position}}'
-                      duration: '{{tv_duration}}'
-                      transparency: '{{tv_transparency}}'
-                      interrupt: '{{tv_interrupt}}'
-                      url: '{{tap_action}}'
-                      attachment:
-                        url: '{{video if video else attachment }}'
-                        content-type: '{{ ''application/vnd.apple.mpegurl'' if ''m3u8''
-                          in video else ''mp4'' if ''mp4'' in video else ''jpeg'' if ''jpg''
-                          in attachment else ''gif'' }}'
+            default:
+            - action: notify.{{ notify_group_target }}
+              data:
+                title: '{{title}}'
+                message: '{{message}}'
+                data:
+                  tag: '{{ review_id }}'
+                  group: '{{ camera | lower }}-frigate-notification }}'
+                  color: '{{color}}'
+                  subject: '{{subtitle}}'
+                  image: '{{attachment}}'
+                  video: '{{video}}'
+                  clickAction: '{{tap_action}}'
+                  ttl: 0
+                  priority: high
+                  notification_icon: '{{icon}}'
+                  sticky: '{{sticky}}'
+                  channel: '{{''alarm_stream'' if critical else channel}}'
+                  car_ui: '{{android_auto}}'
+                  fontsize: '{{tv_size}}'
+                  position: '{{tv_position}}'
+                  duration: '{{tv_duration}}'
+                  transparency: '{{tv_transparency}}'
+                  interrupt: '{{tv_interrupt}}'
+                  subtitle: '{{subtitle}}'
+                  url: '{{tap_action}}'
+                  attachment:
+                    url: '{{video if video else attachment }}'
+                    content-type: '{{ ''application/vnd.apple.mpegurl'' if ''m3u8''
+                      in video else ''mp4'' if ''mp4'' in video else ''jpeg'' if ''jpg''
+                      in attachment else ''gif'' }}'
                   push:
                     sound:
                       name: '{{sound}}'
