@@ -1861,9 +1861,9 @@ actions:
           continue_on_timeout: false
         - variables:
             attachment_2: !input attachment_2
-            attachment: '{{iif(attachment_2, attachment_2, attachment)}}'
             event: '{{ wait.trigger.payload_json if wait.trigger else {}}}'
             type: '{{event[''type''] if wait.trigger else ''timeout''}}'
+            attachment: '{{attachment_2 if type == ''genai'' and attachment_2 else (attachment_2 if attachment_2 else attachment)}}'
             initial_severity: '{{severity}}'
             old_objects: '{{objects}}'
             last_zones: '{{after_zones}}'
@@ -2030,6 +2030,9 @@ actions:
                 - alias: Severity Changed
                   condition: template
                   value_template: '{{severity_updated}}'
+                - alias: GenAI Event
+                  condition: template
+                  value_template: '{{type == ''genai''}}'
                 - and:
                   - alias: Final Update
                     condition: template
