@@ -1710,8 +1710,8 @@ actions:
                     uri: '{{url_3}}'
                     icon: '{{icon_3}}'
                     destructive: true
-                - conditions: '{{ tv }}'
-                  sequence:
+            - conditions: '{{ tv }}'
+              sequence:
               - action: notify.{{ notify_group_target }}
                 data:
                   title: '{{title}}'
