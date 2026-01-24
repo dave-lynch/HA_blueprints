@@ -1324,9 +1324,9 @@ actions:
           if zone_order_enforced else true }}'
         zones_satisfied: '{{zone_single_satisfied and zone_multi_satisfied and zone_order_satisfied}}'
         attachment_input: !input attachment
-        attachment: '{{ attachment_input }}'
         attachment_2_input: !input attachment_2
         attachment_2: '{{ attachment_2_input }}'
+        attachment: '{{ attachment_2 if attachment_2 else attachment_input }}'
         video: !input video
     - alias: Send GenAI Notification
       choose:
