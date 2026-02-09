@@ -776,6 +776,14 @@ blueprint:
               unit_of_measurement: seconds
               step: 1.0
               mode: slider
+        quick_text_notification:
+          name: Quick text notification (Optional)
+          description: 'Send a text-only notification immediately when conditions are
+            met, then send the full notification with image (which replaces it). Speeds
+            up alerts when image generation is slow.'
+          default: true
+          selector:
+            boolean: {}
         final_delay:
           name: Delay Final notification (Optional)
           description: 'How long to delay the final notification for each event. Only
@@ -1181,6 +1189,7 @@ variables:
   loitering: false
   loiter_timer: !input loiter_timer
   initial_delay: !input initial_delay
+  quick_text_notification: !input quick_text_notification
   final_delay: !input final_delay
   fps: '{{ states(''sensor.'' + camera + ''_camera_fps'')|int(5) }}'
   state_only: !input state_filter
@@ -1655,6 +1664,148 @@ actions:
           condition: template
           value_template: '{{ custom_filter }}'
         sequence:
+        - alias: Quick text notification
+          choose:
+          - conditions: '{{ quick_text_notification }}'
+            sequence:
+            - choose:
+              - conditions: '{{ telegram }}'
+                sequence:
+                - action: telegram_bot.send_message
+                  data:
+                    target: '{{telegram_chat_id}}'
+                    message: '{{title}}\n\n{{message}}'
+              - conditions: '{{ not notify_group_target }}'
+                sequence:
+                - device_id: !input notify_device
+                  domain: mobile_app
+                  type: notify
+                  title: '{{title}}'
+                  message: '{{message}}'
+                  data:
+                    tag: '{{ review_id }}'
+                    group: '{{ camera | lower }}-frigate-notification }}'
+                    color: '{{color}}'
+                    subject: '{{subtitle}}'
+                    clickAction: '{{tap_action}}'
+                    ttl: 0
+                    priority: high
+                    notification_icon: '{{icon}}'
+                    sticky: '{{sticky}}'
+                    channel: '{{''alarm_stream'' if critical else channel}}'
+                    car_ui: '{{android_auto}}'
+                    subtitle: '{{subtitle}}'
+                    url: '{{tap_action}}'
+                    push:
+                      sound:
+                        name: '{{sound}}'
+                        volume: '{{ iif(sound == ''none'', 0, volume) }}'
+                        critical: '{{ iif(critical, 1, 0) }}'
+                    entity_id: '{{ios_live_view}}'
+                    actions:
+                    - action: URI
+                      title: '{{button_1}}'
+                      uri: '{{url_1}}'
+                      icon: '{{icon_1}}'
+                    - action: URI
+                      title: '{{button_2}}'
+                      uri: '{{url_2}}'
+                      icon: '{{icon_2}}'
+                    - action: '{{ ''URI'' if ''/'' in url_3 else url_3 }}'
+                      title: '{{button_3}}'
+                      uri: '{{url_3}}'
+                      icon: '{{icon_3}}'
+                      destructive: true
+              - conditions: '{{ tv }}'
+                sequence:
+                - action: notify.{{ notify_group_target }}
+                  data:
+                    title: '{{title}}'
+                    message: '{{message}}'
+                    data:
+                      tag: '{{ review_id }}'
+                      group: '{{ camera | lower }}-frigate-notification }}'
+                      color: '{{color}}'
+                      subject: '{{subtitle}}'
+                      clickAction: '{{tap_action}}'
+                      ttl: 0
+                      priority: high
+                      notification_icon: '{{icon}}'
+                      sticky: '{{sticky}}'
+                      channel: '{{''alarm_stream'' if critical else channel}}'
+                      car_ui: '{{android_auto}}'
+                      fontsize: '{{tv_size}}'
+                      position: '{{tv_position}}'
+                      duration: '{{tv_duration}}'
+                      transparency: '{{tv_transparency}}'
+                      interrupt: '{{tv_interrupt}}'
+                      timeout: 30
+                      subtitle: '{{subtitle}}'
+                      url: '{{tap_action}}'
+                      push:
+                        sound:
+                          name: '{{sound}}'
+                          volume: '{{ iif(sound == ''none'', 0, volume) }}'
+                          critical: '{{ iif(critical, 1, 0) }}'
+                      entity_id: '{{ios_live_view}}'
+                      actions:
+                      - action: URI
+                        title: '{{button_1}}'
+                        uri: '{{url_1}}'
+                        icon: '{{icon_1}}'
+                      - action: URI
+                        title: '{{button_2}}'
+                        uri: '{{url_2}}'
+                        icon: '{{icon_2}}'
+                      - action: '{{ ''URI'' if ''/'' in url_3 else url_3 }}'
+                        title: '{{button_3}}'
+                        uri: '{{url_3}}'
+                        icon: '{{icon_3}}'
+                        destructive: true
+              default:
+              - action: notify.{{ notify_group_target }}
+                data:
+                  title: '{{title}}'
+                  message: '{{message}}'
+                  data:
+                    tag: '{{ review_id }}'
+                    group: '{{ camera | lower }}-frigate-notification }}'
+                    color: '{{color}}'
+                    subject: '{{subtitle}}'
+                    clickAction: '{{tap_action}}'
+                    ttl: 0
+                    priority: high
+                    notification_icon: '{{icon}}'
+                    sticky: '{{sticky}}'
+                    channel: '{{''alarm_stream'' if critical else channel}}'
+                    car_ui: '{{android_auto}}'
+                    subtitle: '{{subtitle}}'
+                    fontsize: '{{tv_size}}'
+                    position: '{{tv_position}}'
+                    duration: '{{tv_duration}}'
+                    transparency: '{{tv_transparency}}'
+                    interrupt: '{{tv_interrupt}}'
+                    url: '{{tap_action}}'
+                    push:
+                      sound:
+                        name: '{{sound}}'
+                        volume: '{{ iif(sound == ''none'', 0, volume) }}'
+                        critical: '{{ iif(critical, 1, 0) }}'
+                    entity_id: '{{ios_live_view}}'
+                    actions:
+                    - action: URI
+                      title: '{{button_1}}'
+                      uri: '{{url_1}}'
+                      icon: '{{icon_1}}'
+                    - action: URI
+                      title: '{{button_2}}'
+                      uri: '{{url_2}}'
+                      icon: '{{icon_2}}'
+                    - action: '{{ ''URI'' if ''/'' in url_3 else url_3 }}'
+                      title: '{{button_3}}'
+                      uri: '{{url_3}}'
+                      icon: '{{icon_3}}'
+                      destructive: true
         - alias: Delay for image
           choose:
           - conditions: '{{initial_delay > 0}}'
