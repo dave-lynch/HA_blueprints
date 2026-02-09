@@ -186,6 +186,14 @@ blueprint:
             a template (some examples are provided but you can enter your own as long
             as it outputs true or false)
 
+            Note: When accessing metadata.potential_threat_level, you must use the default
+            filter on metadata FIRST before accessing potential_threat_level, as metadata
+            may be None. Use this pattern:
+            (trigger.payload_json.after.data.metadata | default({})).potential_threat_level | default(0) | int(0)
+
+            Or use the metadata variable which is always safe:
+            metadata.potential_threat_level | int(0)
+
             '
           default: 'false'
           selector:
@@ -198,6 +206,9 @@ blueprint:
               - '{{''true'' if is_state(''sun.sun'', ''above_horizon'') else ''false''
                 }}'
               - '{{ event[''after''][''top_score''] |float(0) > 0.8 }}'
+              - '{{ not is_state(''input_boolean.disable_all_critical_notifications'', ''on'')
+                and (is_state(''input_boolean.frigate_critical_notification_front'', ''on'')
+                or ((trigger.payload_json.after.data.metadata | default({})).potential_threat_level | default(0) | int(0) > 0)) }}'
               custom_value: true
               sort: false
               multiple: false
@@ -1262,7 +1273,7 @@ actions:
     sequence:
     - variables:
         event: '{{ trigger.payload_json }}'
-        metadata: '{{ event[''after''][''data''][''metadata''] | default({}) }}'
+        metadata: '{{ ((event.get(''after'') or {}).get(''data'') or {}).get(''metadata'') or {}) }}'
         review_id: '{{ event[''after''][''id''] }}'
         detections: '{{ event[''after''][''data''][''detections''] | default([]) }}'
         id: '{{ detections[0] if detections and detections|length > 0 else review_id
@@ -1270,12 +1281,12 @@ actions:
         camera: '{{ event[''after''][''camera''] | lower }}'
         genai_title: '{{ metadata.title | default('''') }}'
         genai_shortSummary: '{{ metadata.shortSummary | default('''') }}'
-        genai_threat_level: '{{ metadata.potential_threat_level | int(0) }}'
+        genai_threat_level: '{{ metadata.potential_threat_level | default(0) | int(0) }}'
         title: "{% if genai_threat_level == 2 %}\n  Security Concern: {{ genai_title
           }}\n{% elif genai_threat_level == 1 %}\n  Needs Review: {{ genai_title }}\n{%
           else %}\n  {{ genai_title }}\n{% endif %}"
         message: '{{ genai_shortSummary }}'
-        subtitle: '{{ metadata.time }}'
+        subtitle: '{{ metadata.time | default('''') }}'
         critical_input: !input critical
         critical: '{{ true if critical_input == ''true'' else true if critical_input
           == True else false }}'
@@ -1506,6 +1517,8 @@ actions:
     sequence:
     - variables:
         event: '{{ trigger.payload_json }}'
+        _raw_metadata: '{{ event.get(''after'', {}).get(''data'', {}).get(''metadata'') }}'
+        metadata: '{{ ({''potential_threat_level'': 0} if _raw_metadata is none else (_raw_metadata if _raw_metadata is mapping else {}) | combine({''potential_threat_level'': (_raw_metadata.potential_threat_level | default(0)) if _raw_metadata is mapping and _raw_metadata.potential_threat_level is defined else 0})) }}'
         detections: '{{ event[''after''][''data''][''detections''] }}'
         review_id: '{{event[''after''][''id'']}}'
         id: '{{ detections[0] if detections and detections|length > 0 else review_id
@@ -1862,6 +1875,7 @@ actions:
         - variables:
             attachment_2: !input attachment_2
             event: '{{ wait.trigger.payload_json if wait.trigger else {}}}'
+            metadata: '{{ event.get(''after'', {}).get(''data'', {}).get(''metadata'', {}) if wait.trigger and event.get(''after'') else metadata }}'
             type: '{{event[''type''] if wait.trigger else ''timeout''}}'
             attachment: '{{attachment_2 if type == ''genai'' and attachment_2 else (attachment_2 if attachment_2 else attachment)}}'
             initial_severity: '{{severity}}'
