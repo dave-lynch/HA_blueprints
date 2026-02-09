@@ -1273,7 +1273,7 @@ actions:
     sequence:
     - variables:
         event: '{{ trigger.payload_json }}'
-        metadata: '{{ ((trigger.payload_json.get(''after'') | default({})).get(''data'') | default({})).get(''metadata'') | default({}) }}'
+        metadata: '{{ trigger.payload_json.get(''after'', {}).get(''data'', {}).get(''metadata'', {}) }}'
         review_id: '{{ event[''after''][''id''] }}'
         detections: '{{ event[''after''][''data''][''detections''] | default([]) }}'
         id: '{{ detections[0] if detections and detections|length > 0 else review_id
